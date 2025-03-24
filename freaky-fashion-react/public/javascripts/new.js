@@ -1,41 +1,62 @@
-const form = document.querySelector("form");
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-form.addEventListener("submit", (event) => {
-    
-    event.preventDefault();
+const AdminNewProduct = () => {
+  const navigate = useNavigate();
 
-    const formData = new FormData(event.target); 
- 
-    const product = {
-        name: formData.get("name"),
-        description: formData.get("description"),
-        image: formData.get("image"),
-        brand: formData.get("brand"),
-        sku: formData.get("sku"),
-        price: formData.get("price"),
-        publicationDate: formData.get("publicationDate"),
-        slug: formData.get("slug")
-    }
-    
-    fetch("/admin/products/new", {
-        method: "POST",
-        body: formData
-    })
-    
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.error);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message); 
-        
-        window.location.href = "/admin/products";
-    })
-    .catch(error => {
-        alert(error.message); 
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    image: null,
+    brand: "",
+    sku: "",
+    price: "",
+    publicationDate: "",
+    slug: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "file" ? files[0] : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
     });
-});
+
+    try {
+      const res = await fetch("/admin/products/new", {
+        method: "POST",
+        body: data,
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Ett fel inträffade.");
+      }
+
+      const result = await res.json();
+      alert(result.message);
+      navigate("/admin/products"); // ✅ React-style navigation
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} encType="multipart/form-data">
+      <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Namn" />
+      {/* Repeat for other inputs... */}
+      <button type="submit">Lägg till</button>
+    </form>
+  );
+};
+
+export default AdminNewProduct;
