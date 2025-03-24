@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./admin.css";
 
 const AdminNewProduct = ({ title = "Ny produkt" }) => {
   const [formData, setFormData] = useState({
