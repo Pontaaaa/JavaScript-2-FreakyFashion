@@ -136,7 +136,7 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
                 placeholder="SKU"
                 required
                 maxLength="10"
-                pattern="^[A-Za-z]{3}\\d{3}$"
+                pattern="^[A-Za-z]{3}\d{3}$"
                 title="Formatet ska vara XXXYYY. Exempel: AAA111"
                 value={formData.sku}
                 onChange={handleChange}

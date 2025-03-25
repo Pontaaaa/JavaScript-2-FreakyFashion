@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import "./ProductDetailsPage.css"; // Import your CSS
 
 const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
   useEffect(() => {
