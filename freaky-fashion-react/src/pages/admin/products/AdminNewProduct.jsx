@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminNewProduct = ({ title = "Ny produkt" }) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -10,6 +13,10 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
     price: "",
     publicationDate: "",
   });
+
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -40,7 +47,9 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
 
       const result = await res.json();
       alert(result.message || "Produkten har lagts till!");
-      // Redirect or clear form here if needed
+
+      // ✅ Redirect to admin products page
+      navigate("/admin/products");
     } catch (err) {
       alert(err.message);
     }
