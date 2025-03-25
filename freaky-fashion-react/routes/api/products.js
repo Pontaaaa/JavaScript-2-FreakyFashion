@@ -52,7 +52,7 @@ router.post("/", upload.single("image"), (req, res) => {
       INSERT INTO products (name, description, image, brand, sku, price, publicationDate, slug, isNew)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-
+  
     insert.run(
       name,
       description,
@@ -62,14 +62,12 @@ router.post("/", upload.single("image"), (req, res) => {
       price,
       publicationDate,
       slug,
-      1 // isNew = true
+      1 // isNew
     );
-
-    res.status(201).json({ message: "Produkten har lagts till!" });
+  
+    return res.status(201).json({ message: "Produkten har lagts till!" }); // ✅ Success
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Något gick fel vid sparning av produkten." });
-  }
-});
-
-module.exports = router;
+      return res.status(500).json({ message: "Något gick fel vid sparning av produkten." }); // ✅ Error fallback
+    }
+  });
