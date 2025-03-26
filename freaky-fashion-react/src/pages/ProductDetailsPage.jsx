@@ -1,9 +1,23 @@
 import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
+const ProductDetailsPage = ({ products = [] }) => {
+  const { slug } = useParams();
+
+  const product = products.find((p) => p.slug === slug);
+  const similarProducts = products.filter((p) => p.slug !== slug).slice(0, 6); // Example logic
+
   useEffect(() => {
-    document.title = title || "Freaky Fashion";
-  }, [title]);
+    document.title = product?.name || "Freaky Fashion";
+  }, [product]);
+
+  if (!product) {
+    return (
+      <div className="container">
+        <h2>Produkten kunde inte hittas</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -11,7 +25,6 @@ const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
         <a href="/">
           <img src="/images/FR.PNG" alt="freakyfashion logo" className="logo" />
         </a>
-
         <form className="search-form">
           <div className="search-container">
             <input type="text" name="q" placeholder="Sök produkt" className="search-input" />
@@ -20,10 +33,8 @@ const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
             </button>
           </div>
         </form>
-
         <a href="#" className="favorites-icon"><i className="fa-solid fa-heart"></i></a>
         <a href="#" className="basket-icon"><i className="fa-solid fa-bag-shopping"></i></a>
-
         <nav>
           <ul>
             <li><a href="#">Nyheter</a></li>
@@ -38,20 +49,18 @@ const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
       <main>
         <div className="product-details-container">
           <div className="details-product-image-container">
-            {product?.isNew && <div className="new-badge">Nyhet</div>}
-
-            <img src={product?.image} alt={product?.name} className="details-product-image" />
-
+            {product.isNew && <div className="new-badge">Nyhet</div>}
+            <img src={product.image} alt={product.name} className="details-product-image" />
             <div className="details-favorite-icon">
               <i className="fa-solid fa-heart"></i>
             </div>
           </div>
 
           <div className="details-product-info">
-            <h1 className="details-product-title">{product?.name}</h1>
-            <p className="details-product-brand">{product?.brand}</p>
-            <p className="details-product-description">{product?.description}</p>
-            <p className="details-product-price">{product?.price} SEK</p>
+            <h1 className="details-product-title">{product.name}</h1>
+            <p className="details-product-brand">{product.brand}</p>
+            <p className="details-product-description">{product.description}</p>
+            <p className="details-product-price">{product.price} SEK</p>
             <button className="add-to-cart-button">Lägg i varukorg</button>
           </div>
         </div>
@@ -59,7 +68,6 @@ const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
         {/* Carousel for similar products */}
         <div className="carousel-container">
           <h2>Liknande produkter</h2>
-
           <div id="carouselExample" className="carousel slide" data-bs-ride="false">
             <div className="carousel-inner">
               {Array.from({ length: Math.ceil(similarProducts.length / 3) }).map((_, i) => (
@@ -81,8 +89,6 @@ const ProductDetailsPage = ({ title, product, similarProducts = [] }) => {
                 </div>
               ))}
             </div>
-
-            {/* Carousel Controls */}
             <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
               <span className="fa-solid fa-arrow-left" aria-hidden="true"></span>
               <span className="visually-hidden">Previous</span>

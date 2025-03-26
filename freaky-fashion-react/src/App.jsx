@@ -24,9 +24,12 @@ function App() {
           path="/"
           element={<HomePage products={products} title="Freaky Fashion" />}
         />
-        <Route path="/products/:slug" element={<ProductDetailsPage />} />
+        <Route
+          path="/products/:slug"
+          element={<ProductDetailsPage products={products} />}
+        />
         <Route path="/admin/products/new" element={<AdminNewProduct />} />
-        <Route path="/admin/products" element={<AdminProducts />} /> {/* ✅ new route */}
+        <Route path="/admin/products" element={<AdminProducts />} />
       </Routes>
     </BrowserRouter>
   );

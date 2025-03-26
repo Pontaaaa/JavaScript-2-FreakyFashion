@@ -13,7 +13,7 @@ const HomePage = ({ title, products = [] }) => {
     <div className="container">
       <header>
         <a href="/">
-          <img src="/images/FR.png" alt="freakyfashion logo" className="logo" />
+          <img src="/public/images/FR.png" alt="freakyfashion logo" className="logo" />
         </a>
         <form className="search-form">
           <div className="search-container">

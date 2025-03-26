@@ -1,7 +1,3 @@
-console.log("✅ POST /api/products called");
-console.log("🧾 Request body:", req.body);
-console.log("🖼️ Uploaded file:", req.file);
-
 const express = require("express");
 const router = express.Router();
 const path = require("path");
@@ -25,37 +21,38 @@ const upload = multer({ storage });
 
 // ✅ GET /api/products – Fetch all products
 router.get("/", (req, res) => {
-  const stmt = db.prepare("SELECT * FROM products");
-  const products = stmt.all();
-  res.json(products);
+  try {
+    const stmt = db.prepare("SELECT * FROM products");
+    const products = stmt.all();
+    res.json(products);
+  } catch (err) {
+    console.error("❌ Failed to fetch products:", err);
+    res.status(500).json({ message: "Kunde inte hämta produkter." });
+  }
 });
 
 // ✅ POST /api/products – Add new product
 router.post("/", upload.single("image"), (req, res) => {
-  const { name, description, brand, sku, price, publicationDate } = req.body;
-  const imageFile = req.file;
-
-  console.log("➡️ POST /api/products called");
-  console.log("Form data:", req.body);
-  console.log("File info:", req.file);
-
-  // Validation: check required fields
-  if (!name || !description || !brand || !sku || !price || !publicationDate || !imageFile) {
-    return res.status(400).json({ message: "Alla fält måste fyllas i." });
-  }
-
-  // ✅ SKU format validation: AAA111
-  if (!sku.match(/^[A-Za-z]{3}\d{3}$/)) {
-    return res.status(400).json({ message: "SKU-formatet är felaktigt. Exempel: AAA111" });
-  }
-
-  // ✅ Save image path
-  const imagePath = `/images/${imageFile.filename}`;
-
-  // ✅ Generate slug (e.g. "cool-shirt")
-  const slug = name.toLowerCase().replace(/\s+/g, "-");
+  console.log("✅ POST /api/products called");
+  console.log("🧾 Request body:", req.body);
+  console.log("🖼️ Uploaded file:", req.file);
 
   try {
+    const { name, description, brand, sku, price, publicationDate } = req.body;
+    const imageFile = req.file;
+
+    if (!name || !description || !brand || !sku || !price || !publicationDate || !imageFile) {
+      console.warn("⚠️ Missing field(s)");
+      return res.status(400).json({ message: "Alla fält måste fyllas i." });
+    }
+
+    if (!sku.match(/^[A-Za-z]{3}\d{3}$/)) {
+      return res.status(400).json({ message: "SKU-formatet är felaktigt. Exempel: AAA111" });
+    }
+
+    const imagePath = `/images/${imageFile.filename}`;
+    const slug = name.toLowerCase().replace(/\s+/g, "-");
+
     const insert = db.prepare(`
       INSERT INTO products (name, description, image, brand, sku, price, publicationDate, slug, isNew)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -70,15 +67,35 @@ router.post("/", upload.single("image"), (req, res) => {
       price,
       publicationDate,
       slug,
-      1 // isNew
+      1
     );
 
-    return res.status(201).json({ message: "Produkten har lagts till!" }); // ✅ Success
+    console.log("✅ Product inserted successfully");
+    return res.status(201).json({ message: "Produkten har lagts till!" });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Något gick fel vid sparning av produkten." }); // ✅ Error fallback
+    console.error("💥 Insert error:", err);
+    res.status(500).json({ message: "Något gick fel vid sparning av produkten." });
   }
 });
 
-// ✅ Export the router
+// ✅ DELETE /api/products/:id – Delete a product
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const stmt = db.prepare("DELETE FROM products WHERE id = ?");
+    const result = stmt.run(id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ message: "Produkten kunde inte hittas." });
+    }
+
+    console.log(`🗑️ Product with ID ${id} deleted`);
+    res.status(200).json({ message: "Produkten har raderats." });
+  } catch (err) {
+    console.error("💥 Delete error:", err);
+    res.status(500).json({ message: "Något gick fel vid radering." });
+  }
+});
+
 module.exports = router;

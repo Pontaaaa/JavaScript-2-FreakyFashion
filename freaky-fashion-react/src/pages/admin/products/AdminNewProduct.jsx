@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import "./admin.css";
 
 const AdminNewProduct = ({ title = "Ny produkt" }) => {
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -13,10 +11,6 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
     price: "",
     publicationDate: "",
   });
-
-  useEffect(() => {
-    document.title = title;
-  }, [title]);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -28,35 +22,32 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const data = new FormData();
     for (const key in formData) {
       data.append(key, formData[key]);
     }
-
+  
+    // ✅ Debug log
+    for (let pair of data.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
+  
     try {
       const res = await fetch("/api/products", {
         method: "POST",
         body: data,
       });
-
-      if (!res.ok) {
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const error = await res.json();
-          throw new Error(error.message || "Något gick fel");
-        } else {
-          throw new Error("Ett okänt fel inträffade.");
-        }
-      }
-
+  
       const result = await res.json();
+  
+      if (!res.ok) {
+        throw new Error(result.message || "Något gick fel");
+      }
+  
       alert(result.message || "Produkten har lagts till!");
-
-      // ✅ Redirect to admin products page
-      navigate("/admin/products");
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Ett okänt fel inträffade.");
     }
   };
 
