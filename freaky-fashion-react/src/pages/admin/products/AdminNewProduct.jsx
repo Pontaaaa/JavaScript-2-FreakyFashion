@@ -41,8 +41,13 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Något gick fel");
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const error = await res.json();
+          throw new Error(error.message || "Något gick fel");
+        } else {
+          throw new Error("Ett okänt fel inträffade.");
+        }
       }
 
       const result = await res.json();

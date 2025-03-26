@@ -1,3 +1,7 @@
+console.log("✅ POST /api/products called");
+console.log("🧾 Request body:", req.body);
+console.log("🖼️ Uploaded file:", req.file);
+
 const express = require("express");
 const router = express.Router();
 const path = require("path");
@@ -31,6 +35,10 @@ router.post("/", upload.single("image"), (req, res) => {
   const { name, description, brand, sku, price, publicationDate } = req.body;
   const imageFile = req.file;
 
+  console.log("➡️ POST /api/products called");
+  console.log("Form data:", req.body);
+  console.log("File info:", req.file);
+
   // Validation: check required fields
   if (!name || !description || !brand || !sku || !price || !publicationDate || !imageFile) {
     return res.status(400).json({ message: "Alla fält måste fyllas i." });
@@ -52,7 +60,7 @@ router.post("/", upload.single("image"), (req, res) => {
       INSERT INTO products (name, description, image, brand, sku, price, publicationDate, slug, isNew)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-  
+
     insert.run(
       name,
       description,
@@ -64,10 +72,13 @@ router.post("/", upload.single("image"), (req, res) => {
       slug,
       1 // isNew
     );
-  
+
     return res.status(201).json({ message: "Produkten har lagts till!" }); // ✅ Success
   } catch (err) {
     console.error(err);
-      return res.status(500).json({ message: "Något gick fel vid sparning av produkten." }); // ✅ Error fallback
-    }
-  });
+    return res.status(500).json({ message: "Något gick fel vid sparning av produkten." }); // ✅ Error fallback
+  }
+});
+
+// ✅ Export the router
+module.exports = router;
