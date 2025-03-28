@@ -60,18 +60,18 @@ const AdminNewProduct = ({ title = "Ny produkt" }) => {
       </header>
 
       <div className="admin-container">
-        <aside className="admin-menu">
-          <nav>
-            <ul>
-              <li><a href="#">Dashboard</a></li>
-              <li><a href="/admin/products">Produkter</a></li>
-              <li><a href="#">Orderhantering</a></li>
-              <li><a href="#">Analysdata</a></li>
-              <li><a href="#">Inställningar</a></li>
-              <li><a href="#">Support</a></li>
-            </ul>
-          </nav>
-        </aside>
+      <aside className="admin-menu">
+  <nav>
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="/admin/products">Produkter</a></li>
+      <li><a href="#">Orderhantering</a></li>
+      <li><a href="#">Analysdata</a></li>
+      <li><a href="#">Inställningar</a></li>
+      <li><a href="#">Support</a></li>
+    </ul>
+  </nav>
+</aside>
 
         <main className="admin-content">
           <div className="content-header">
