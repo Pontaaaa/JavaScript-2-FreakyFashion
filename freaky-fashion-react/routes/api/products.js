@@ -10,7 +10,7 @@ const db = new Database("./db/freakyfashion.db", { verbose: console.log });
 // Multer config for image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/images"); // Save to /public/images
+    cb(null, "public/images");
   },
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${file.originalname}`;
@@ -19,11 +19,23 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// ✅ GET all products
+router.get("/", (req, res) => {
+  try {
+    const stmt = db.prepare("SELECT * FROM products");
+    const products = stmt.all();
+    res.json(products);
+  } catch (err) {
+    console.error("❌ Failed to fetch products:", err);
+    res.status(500).json({ message: "Kunde inte hämta produkter." });
+  }
+});
+
+// ✅ SEARCH
 router.get("/search", (req, res) => {
   const query = req.query.q?.toLowerCase();
-
   if (!query) {
-    return res.status(400).json({ message: "Ingen sökterm angiven." });
+    return res.status(400).json({ message: "Sökfråga saknas." });
   }
 
   try {
@@ -34,12 +46,12 @@ router.get("/search", (req, res) => {
     const results = stmt.all(`%${query}%`, `%${query}%`, `%${query}%`);
     res.json(results);
   } catch (err) {
-    console.error("❌ Fel vid sökning:", err);
-    res.status(500).json({ message: "Något gick fel vid sökningen." });
+    console.error("❌ Sökfel:", err);
+    res.status(500).json({ message: "Kunde inte hämta sökresultat." });
   }
 });
 
-// ✅ POST /api/products – Add new product
+// ✅ POST new product
 router.post("/", upload.single("image"), (req, res) => {
   console.log("✅ POST /api/products called");
   console.log("🧾 Request body:", req.body);
@@ -50,7 +62,6 @@ router.post("/", upload.single("image"), (req, res) => {
     const imageFile = req.file;
 
     if (!name || !description || !brand || !sku || !price || !publicationDate || !imageFile) {
-      console.warn("⚠️ Missing field(s)");
       return res.status(400).json({ message: "Alla fält måste fyllas i." });
     }
 
@@ -66,30 +77,18 @@ router.post("/", upload.single("image"), (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    insert.run(
-      name,
-      description,
-      imagePath,
-      brand,
-      sku,
-      price,
-      publicationDate,
-      slug,
-      1
-    );
+    insert.run(name, description, imagePath, brand, sku, price, publicationDate, slug, 1);
 
-    console.log("✅ Product inserted successfully");
-    return res.status(201).json({ message: "Produkten har lagts till!" });
+    res.status(201).json({ message: "Produkten har lagts till!" });
   } catch (err) {
     console.error("💥 Insert error:", err);
     res.status(500).json({ message: "Något gick fel vid sparning av produkten." });
   }
 });
 
-// ✅ DELETE /api/products/:id – Delete a product
+// ✅ DELETE product
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-
   try {
     const stmt = db.prepare("DELETE FROM products WHERE id = ?");
     const result = stmt.run(id);
@@ -98,32 +97,10 @@ router.delete("/:id", (req, res) => {
       return res.status(404).json({ message: "Produkten kunde inte hittas." });
     }
 
-    console.log(`🗑️ Product with ID ${id} deleted`);
     res.status(200).json({ message: "Produkten har raderats." });
   } catch (err) {
     console.error("💥 Delete error:", err);
     res.status(500).json({ message: "Något gick fel vid radering." });
-  }
-});
-
-router.get("/search", (req, res) => {
-  const db = require("../../db"); // If you already initialized it elsewhere, remove this line.
-  const query = req.query.q?.toLowerCase();
-
-  if (!query) {
-    return res.status(400).json({ message: "Sökfråga saknas." });
-  }
-
-  try {
-    const stmt = db.prepare(`
-      SELECT * FROM products
-      WHERE LOWER(name) LIKE ? OR LOWER(brand) LIKE ?
-    `);
-    const products = stmt.all(`%${query}%`, `%${query}%`);
-    res.json(products);
-  } catch (err) {
-    console.error("❌ Sökfel:", err);
-    res.status(500).json({ message: "Kunde inte hämta sökresultat." });
   }
 });
 

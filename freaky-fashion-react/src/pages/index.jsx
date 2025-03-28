@@ -70,7 +70,7 @@ const HomePage = ({ title, products = [] }) => {
       <main>
         {hero && (
           <div className="hero-container">
-            <img src={hero.image} alt="Hero" className="heroplaceholder" />
+            <img src={`/images/${hero.image}`} alt="Hero" className="heroplaceholder" />
           </div>
         )}
 

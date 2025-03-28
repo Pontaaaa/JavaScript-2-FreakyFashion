@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   res.json({
-    image: "/images/hero.jpg",
+    image: "hero.jpg",
     heading: "Hero",
   });
 });

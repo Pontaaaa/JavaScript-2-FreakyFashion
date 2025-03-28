@@ -4,37 +4,117 @@ import { useLocation } from "react-router-dom";
 const SearchResultsPage = () => {
   const { search } = useLocation();
   const query = new URLSearchParams(search).get("q");
-
   const [results, setResults] = useState([]);
 
   useEffect(() => {
     if (query) {
       fetch(`/api/products/search?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => setResults(data))
+        .then((res) => res.json())
+        .then((data) => setResults(data))
         .catch(() => alert("Kunde inte hämta sökresultat."));
     }
   }, [query]);
 
   return (
     <div className="container">
-      <h1>Sökresultat för: "{query}"</h1>
-      <div className="product-container">
-        {results.length === 0 ? (
-          <p>Inga produkter hittades.</p>
-        ) : (
-          results.map((product) => (
-            <a key={product.id} href={`/products/${product.slug}`} className="product-card">
-              {product.isNew && <div className="new-badge">Nyhet</div>}
-              <img src={product.image} alt={product.name} className="product-image" />
-              <div className="product-info">
-                <p className="product-title">{product.name}</p>
-                <p className="product-brand">{product.brand}</p>
-                <p className="product-price">{product.price} SEK</p>
-              </div>
-            </a>
-          ))
-        )}
+      {/* Header */}
+      <header>
+        <a href="/">
+          <img src="/images/FR.PNG" alt="freakyfashion logo" className="logo" />
+        </a>
+        <form className="search-form">
+          <div className="search-container">
+            <input
+              type="text"
+              name="q"
+              placeholder="Sök produkt"
+              className="search-input"
+            />
+            <button type="submit" className="search-button">
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </form>
+        <a href="#" className="favorites-icon">
+          <i className="fa-solid fa-heart"></i>
+        </a>
+        <a href="#" className="basket-icon">
+          <i className="fa-solid fa-bag-shopping"></i>
+        </a>
+        <nav>
+          <ul>
+            <li><a href="#">Nyheter</a></li>
+            <li><a href="#">Kategorier</a></li>
+            <li><a href="#">Topplistan</a></li>
+            <li><a href="#">Rea</a></li>
+            <li><a href="#">Kampanjer</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      {/* Search Results */}
+      <main>
+        <h1>Sökresultat för: "{query}"</h1>
+        <div className="product-container">
+          {results.length === 0 ? (
+            <p>Inga produkter hittades.</p>
+          ) : (
+            results.map((product) => (
+              <a key={product.id} href={`/products/${product.slug}`} className="product-card">
+                {product.isNew && <div className="new-badge">Nyhet</div>}
+                <img src={product.image} alt={product.name} className="product-image" />
+                <div className="product-info">
+                  <p className="product-title">{product.name}</p>
+                  <p className="product-brand">{product.brand}</p>
+                  <p className="product-price">{product.price} SEK</p>
+                </div>
+              </a>
+            ))
+          )}
+        </div>
+
+        {/* Info Banner (as in image) */}
+        <div className="info-container">
+          <div className="info-item"><i className="fa-solid fa-earth-americas"></i><p>Gratis frakt och returer</p></div>
+          <div className="info-item"><i className="fa-solid fa-jet-fighter"></i><p>Expressfrakt</p></div>
+          <div className="info-item"><i className="fa-solid fa-shield-halved"></i><p>Säkra betalningar</p></div>
+          <div className="info-item"><i className="fa-regular fa-face-smile"></i><p>Nyheter varje dag</p></div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <div className="bottom-section-wrapper">
+        <div className="bottom-list-container">
+          {[
+            {
+              id: "shoppingList",
+              title: "Shopping",
+              links: ["T-shirts", "Skor", "Hoodies"],
+            },
+            {
+              id: "myPagesList",
+              title: "Mina sidor",
+              links: ["Mitt konto", "Beställningar", "Returnera artikel"],
+            },
+            {
+              id: "customerServiceList",
+              title: "Kundtjänst",
+              links: ["Kontakta oss", "Köpvillkor", "Returpolicy"],
+            },
+          ].map(({ id, title, links }) => (
+            <div key={id} className="bottom-list-section" id={id}>
+              <h2>{title}</h2>
+              <ul>
+                {links.map((text, index) => (
+                  <li key={index}><a href="#">{text}</a></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <footer className="footer">
+          <p>© 2024 Freaky Fashion</p>
+        </footer>
       </div>
     </div>
   );
