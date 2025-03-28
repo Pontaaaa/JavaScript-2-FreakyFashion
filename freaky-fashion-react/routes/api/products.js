@@ -19,15 +19,23 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ GET /api/products – Fetch all products
-router.get("/", (req, res) => {
+router.get("/search", (req, res) => {
+  const query = req.query.q?.toLowerCase();
+
+  if (!query) {
+    return res.status(400).json({ message: "Ingen sökterm angiven." });
+  }
+
   try {
-    const stmt = db.prepare("SELECT * FROM products");
-    const products = stmt.all();
-    res.json(products);
+    const stmt = db.prepare(`
+      SELECT * FROM products
+      WHERE LOWER(name) LIKE ? OR LOWER(description) LIKE ? OR LOWER(brand) LIKE ?
+    `);
+    const results = stmt.all(`%${query}%`, `%${query}%`, `%${query}%`);
+    res.json(results);
   } catch (err) {
-    console.error("❌ Failed to fetch products:", err);
-    res.status(500).json({ message: "Kunde inte hämta produkter." });
+    console.error("❌ Fel vid sökning:", err);
+    res.status(500).json({ message: "Något gick fel vid sökningen." });
   }
 });
 
@@ -95,6 +103,27 @@ router.delete("/:id", (req, res) => {
   } catch (err) {
     console.error("💥 Delete error:", err);
     res.status(500).json({ message: "Något gick fel vid radering." });
+  }
+});
+
+router.get("/search", (req, res) => {
+  const db = require("../../db"); // If you already initialized it elsewhere, remove this line.
+  const query = req.query.q?.toLowerCase();
+
+  if (!query) {
+    return res.status(400).json({ message: "Sökfråga saknas." });
+  }
+
+  try {
+    const stmt = db.prepare(`
+      SELECT * FROM products
+      WHERE LOWER(name) LIKE ? OR LOWER(brand) LIKE ?
+    `);
+    const products = stmt.all(`%${query}%`, `%${query}%`);
+    res.json(products);
+  } catch (err) {
+    console.error("❌ Sökfel:", err);
+    res.status(500).json({ message: "Kunde inte hämta sökresultat." });
   }
 });
 

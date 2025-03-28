@@ -1,27 +1,49 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../public/stylesheets/style.css";
 
 const HomePage = ({ title, products = [] }) => {
+  const [search, setSearch] = useState("");
+  const [hero, setHero] = useState(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.title = title || "Freaky Fashion";
+
+    // Fetch hero content from backend
+    fetch("/api/hero")
+      .then((res) => res.json())
+      .then((data) => setHero(data))
+      .catch((err) => console.error("Kunde inte ladda hero-sektionen:", err));
   }, [title]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const query = e.target.q.value.trim();
+  
+    if (query) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
 
   return (
     <div className="container">
       <header>
         <a href="/">
-          <img src="/public/images/FR.png" alt="freakyfashion logo" className="logo" />
+          <img src="/images/FR.PNG" alt="freakyfashion logo" className="logo" />
         </a>
-        <form className="search-form">
+        <form className="search-form" onSubmit={handleSearchSubmit}>
           <div className="search-container">
             <input
               type="text"
               name="q"
               placeholder="Sök produkt"
               className="search-input"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <button type="submit" className="search-button">
               <i className="fa-solid fa-magnifying-glass"></i>
@@ -46,13 +68,11 @@ const HomePage = ({ title, products = [] }) => {
       </header>
 
       <main>
-        <div className="hero-container">
-          <img src="/images/pexels-pixabay-371160.jpg" alt="" className="heroplaceholder" />
-          <div className="hero-text">
-            <h1>Lorem, ipsum dolor.</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        {hero && (
+          <div className="hero-container">
+            <img src={hero.image} alt="Hero" className="heroplaceholder" />
           </div>
-        </div>
+        )}
 
         <div className="image-grid">
           {["pexels-jonaorle-3828245.jpg", "pexels-callmehuyuno-347917.jpg", "pexels-ralph-rabago-3214683.jpg"].map((img, index) => (

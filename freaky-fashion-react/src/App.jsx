@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/index";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import AdminNewProduct from "./pages/admin/products/AdminNewProduct";
-import AdminProducts from "./pages/admin/products/AdminProducts"; // ✅ new
+import AdminProducts from "./pages/admin/products/AdminProducts";
+import SearchResultsPage from "./pages/SearchResultsPage";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -30,6 +31,8 @@ function App() {
         />
         <Route path="/admin/products/new" element={<AdminNewProduct />} />
         <Route path="/admin/products" element={<AdminProducts />} />
+
+        <Route path="/search" element={<SearchResultsPage />} />
       </Routes>
     </BrowserRouter>
   );
