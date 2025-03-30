@@ -16,9 +16,7 @@ const AdminProductList = ({ title = "Produkter" }) => {
     }
   };
 
-  // Optionally load products on mount:
   useEffect(() => {
-    // fetchProducts(); // Uncomment if you want auto-load on page load
   }, []);
 
   return (

@@ -36,20 +36,20 @@ const HomePage = ({ title, products = [] }) => {
           <img src="/images/FR.PNG" alt="freakyfashion logo" className="logo" />
         </a>
         <form className="search-form" onSubmit={handleSearchSubmit}>
-          <div className="search-container">
-            <input
-              type="text"
-              name="q"
-              placeholder="Sök produkt"
-              className="search-input"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button type="submit" className="search-button">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </div>
-        </form>
+  <div className="search-wrapper">
+    <input
+      type="text"
+      name="q"
+      placeholder="Sök produkt"
+      className="search-input"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+    <button type="submit" className="search-icon-button">
+      <i className="fa-solid fa-magnifying-glass"></i>
+    </button>
+  </div>
+</form>
         <a href="#" className="favorites-icon">
           <i className="fa-solid fa-heart"></i>
         </a>

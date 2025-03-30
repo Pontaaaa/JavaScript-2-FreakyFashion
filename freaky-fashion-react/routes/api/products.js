@@ -4,10 +4,8 @@ const path = require("path");
 const multer = require("multer");
 const Database = require("better-sqlite3");
 
-// Database setup
 const db = new Database("./db/freakyfashion.db", { verbose: console.log });
 
-// Multer config for image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/images");
@@ -19,19 +17,17 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ GET all products
 router.get("/", (req, res) => {
   try {
     const stmt = db.prepare("SELECT * FROM products");
     const products = stmt.all();
     res.json(products);
   } catch (err) {
-    console.error("❌ Failed to fetch products:", err);
+    console.error("Failed to fetch products:", err);
     res.status(500).json({ message: "Kunde inte hämta produkter." });
   }
 });
 
-// ✅ SEARCH
 router.get("/search", (req, res) => {
   const query = req.query.q?.toLowerCase();
   if (!query) {
@@ -46,16 +42,15 @@ router.get("/search", (req, res) => {
     const results = stmt.all(`%${query}%`, `%${query}%`, `%${query}%`);
     res.json(results);
   } catch (err) {
-    console.error("❌ Sökfel:", err);
+    console.error("Sökfel:", err);
     res.status(500).json({ message: "Kunde inte hämta sökresultat." });
   }
 });
 
-// ✅ POST new product
 router.post("/", upload.single("image"), (req, res) => {
-  console.log("✅ POST /api/products called");
-  console.log("🧾 Request body:", req.body);
-  console.log("🖼️ Uploaded file:", req.file);
+  console.log("POST /api/products called");
+  console.log("Request body:", req.body);
+  console.log("Uploaded file:", req.file);
 
   try {
     const { name, description, brand, sku, price, publicationDate } = req.body;
@@ -81,12 +76,11 @@ router.post("/", upload.single("image"), (req, res) => {
 
     res.status(201).json({ message: "Produkten har lagts till!" });
   } catch (err) {
-    console.error("💥 Insert error:", err);
+    console.error("Insert error:", err);
     res.status(500).json({ message: "Något gick fel vid sparning av produkten." });
   }
 });
 
-// ✅ DELETE product
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   try {
@@ -99,7 +93,7 @@ router.delete("/:id", (req, res) => {
 
     res.status(200).json({ message: "Produkten har raderats." });
   } catch (err) {
-    console.error("💥 Delete error:", err);
+    console.error(" Delete error:", err);
     res.status(500).json({ message: "Något gick fel vid radering." });
   }
 });

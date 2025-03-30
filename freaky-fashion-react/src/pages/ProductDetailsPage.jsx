@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const ProductDetailsPage = ({ products = [] }) => {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
   const product = products.find((p) => p.slug === slug);
-  const similarProducts = products.filter((p) => p.slug !== slug).slice(0, 6); // Example logic
+  const similarProducts = products.filter((p) => p.slug !== slug).slice(0, 6);
 
   useEffect(() => {
     document.title = product?.name || "Freaky Fashion";
   }, [product]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const query = e.target.q.value.trim();
+    if (query) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
 
   if (!product) {
     return (
@@ -25,16 +35,26 @@ const ProductDetailsPage = ({ products = [] }) => {
         <a href="/">
           <img src="/images/FR.PNG" alt="freakyfashion logo" className="logo" />
         </a>
-        <form className="search-form">
-          <div className="search-container">
-            <input type="text" name="q" placeholder="Sök produkt" className="search-input" />
-            <button type="submit" className="search-button">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </div>
-        </form>
+
+        <form className="search-form" onSubmit={handleSearchSubmit}>
+  <div className="search-wrapper">
+    <input
+      type="text"
+      name="q"
+      placeholder="Sök produkt"
+      className="search-input"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+    <button type="submit" className="search-icon-button">
+      <i className="fa-solid fa-magnifying-glass"></i>
+    </button>
+  </div>
+</form>
+
         <a href="#" className="favorites-icon"><i className="fa-solid fa-heart"></i></a>
         <a href="#" className="basket-icon"><i className="fa-solid fa-bag-shopping"></i></a>
+
         <nav>
           <ul>
             <li><a href="#">Nyheter</a></li>
@@ -65,7 +85,6 @@ const ProductDetailsPage = ({ products = [] }) => {
           </div>
         </div>
 
-        {/* Carousel for similar products */}
         <div className="carousel-container">
           <h2>Liknande produkter</h2>
           <div id="carouselExample" className="carousel slide" data-bs-ride="false">
@@ -89,6 +108,7 @@ const ProductDetailsPage = ({ products = [] }) => {
                 </div>
               ))}
             </div>
+
             <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
               <span className="fa-solid fa-arrow-left" aria-hidden="true"></span>
               <span className="visually-hidden">Previous</span>
@@ -100,7 +120,6 @@ const ProductDetailsPage = ({ products = [] }) => {
           </div>
         </div>
 
-        {/* Info Items */}
         <div className="info-container">
           <div className="info-item"><i className="fa-solid fa-earth-americas"></i><p>Gratis frakt och returer</p></div>
           <div className="info-item"><i className="fa-solid fa-jet-fighter"></i><p>Expressfrakt</p></div>
@@ -109,7 +128,6 @@ const ProductDetailsPage = ({ products = [] }) => {
         </div>
       </main>
 
-      {/* Accordion Section */}
       <div className="accordion" id="accordionExample">
         {[
           { id: "Shopping", title: "Shopping", links: ["T-shirts", "Hoodies", "Toppar"] },
@@ -147,7 +165,6 @@ const ProductDetailsPage = ({ products = [] }) => {
         ))}
       </div>
 
-      {/* Footer */}
       <div className="bottom-section-wrapper">
         <div className="bottom-list-container">
           {[

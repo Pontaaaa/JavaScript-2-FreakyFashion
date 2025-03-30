@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SearchResultsPage = () => {
-  const { search } = useLocation();
-  const query = new URLSearchParams(search).get("q");
+  const location = useLocation();
+  const query = new URLSearchParams(location.search).get("q");
+
   const [results, setResults] = useState([]);
+  const [searchInput, setSearchInput] = useState(query || "");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (query) {
@@ -15,32 +18,39 @@ const SearchResultsPage = () => {
     }
   }, [query]);
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`);
+    }
+  };
+
   return (
     <div className="container">
-      {/* Header */}
       <header>
         <a href="/">
           <img src="/images/FR.PNG" alt="freakyfashion logo" className="logo" />
         </a>
-        <form className="search-form">
-          <div className="search-container">
+
+        <form className="search-form" onSubmit={handleSearchSubmit}>
+          <div className="search-wrapper">
             <input
               type="text"
               name="q"
               placeholder="Sök produkt"
               className="search-input"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
-            <button type="submit" className="search-button">
+            <button type="submit" className="search-icon-button">
               <i className="fa-solid fa-magnifying-glass"></i>
             </button>
           </div>
         </form>
-        <a href="#" className="favorites-icon">
-          <i className="fa-solid fa-heart"></i>
-        </a>
-        <a href="#" className="basket-icon">
-          <i className="fa-solid fa-bag-shopping"></i>
-        </a>
+
+        <a href="#" className="favorites-icon"><i className="fa-solid fa-heart"></i></a>
+        <a href="#" className="basket-icon"><i className="fa-solid fa-bag-shopping"></i></a>
+
         <nav>
           <ul>
             <li><a href="#">Nyheter</a></li>
@@ -52,7 +62,6 @@ const SearchResultsPage = () => {
         </nav>
       </header>
 
-      {/* Search Results */}
       <main>
         <h1>Sökresultat för: "{query}"</h1>
         <div className="product-container">
@@ -73,7 +82,6 @@ const SearchResultsPage = () => {
           )}
         </div>
 
-        {/* Info Banner (as in image) */}
         <div className="info-container">
           <div className="info-item"><i className="fa-solid fa-earth-americas"></i><p>Gratis frakt och returer</p></div>
           <div className="info-item"><i className="fa-solid fa-jet-fighter"></i><p>Expressfrakt</p></div>
@@ -82,25 +90,12 @@ const SearchResultsPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <div className="bottom-section-wrapper">
         <div className="bottom-list-container">
           {[
-            {
-              id: "shoppingList",
-              title: "Shopping",
-              links: ["T-shirts", "Skor", "Hoodies"],
-            },
-            {
-              id: "myPagesList",
-              title: "Mina sidor",
-              links: ["Mitt konto", "Beställningar", "Returnera artikel"],
-            },
-            {
-              id: "customerServiceList",
-              title: "Kundtjänst",
-              links: ["Kontakta oss", "Köpvillkor", "Returpolicy"],
-            },
+            { id: "shoppingList", title: "Shopping", links: ["T-shirts", "Skor", "Hoodies"] },
+            { id: "myPagesList", title: "Mina sidor", links: ["Mitt konto", "Beställningar", "Returnera artikel"] },
+            { id: "customerServiceList", title: "Kundtjänst", links: ["Kontakta oss", "Köpvillkor", "Returpolicy"] },
           ].map(({ id, title, links }) => (
             <div key={id} className="bottom-list-section" id={id}>
               <h2>{title}</h2>
